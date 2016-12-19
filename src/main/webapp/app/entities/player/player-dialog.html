@@ -1,0 +1,81 @@
+
+<form name="editForm" role="form" novalidate ng-submit="vm.save()">
+
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+                ng-click="vm.clear()">&times;</button>
+        <h4 class="modal-title" id="myPlayerLabel" data-translate="baloncestoApp.player.home.createOrEditLabel">Create or edit a Player</h4>
+    </div>
+    <div class="modal-body">
+        <jhi-alert-error></jhi-alert-error>
+        <div class="form-group" ng-show="vm.player.id">
+            <label for="id" data-translate="global.field.id">ID</label>
+            <input type="text" class="form-control" id="id" name="id"
+                    ng-model="vm.player.id" readonly />
+        </div>
+        <div class="form-group">
+            <label class="control-label" data-translate="baloncestoApp.player.name" for="field_name">Name</label>
+            <input type="text" class="form-control" name="name" id="field_name"
+                    ng-model="vm.player.name"
+                     />
+        </div>
+        <div class="form-group">
+            <label class="control-label" data-translate="baloncestoApp.player.surname" for="field_surname">Surname</label>
+            <input type="text" class="form-control" name="surname" id="field_surname"
+                    ng-model="vm.player.surname"
+                     />
+        </div>
+        <div class="form-group">
+            <label class="control-label" data-translate="baloncestoApp.player.birthdate" for="field_birthdate">Birthdate</label>
+                <div class="input-group">
+                    <input id="field_birthdate" type="text" class="form-control" name="birthdate" uib-datepicker-popup="{{dateformat}}" ng-model="vm.player.birthdate" is-open="vm.datePickerOpenStatus.birthdate"
+                    />
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-click="vm.openCalendar('birthdate')"><i class="glyphicon glyphicon-calendar"></i></button>
+                    </span>
+                </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" data-translate="baloncestoApp.player.numBaskets" for="field_numBaskets">Num Baskets</label>
+            <input type="number" class="form-control" name="numBaskets" id="field_numBaskets"
+                    ng-model="vm.player.numBaskets"
+                     />
+        </div>
+        <div class="form-group">
+            <label class="control-label" data-translate="baloncestoApp.player.numAssists" for="field_numAssists">Num Assists</label>
+            <input type="number" class="form-control" name="numAssists" id="field_numAssists"
+                    ng-model="vm.player.numAssists"
+                     />
+        </div>
+        <div class="form-group">
+            <label class="control-label" data-translate="baloncestoApp.player.numRebounds" for="field_numRebounds">Num Rebounds</label>
+            <input type="number" class="form-control" name="numRebounds" id="field_numRebounds"
+                    ng-model="vm.player.numRebounds"
+                     />
+        </div>
+        <div class="form-group">
+            <label class="control-label" data-translate="baloncestoApp.player.position" for="field_position">Position</label>
+            <select class="form-control" name="position" ng-model="vm.player.position" id="field_position">
+                <option value="ALERO" data-translate="baloncestoApp.Position.ALERO">ALERO</option>
+                <option value="BASE" data-translate="baloncestoApp.Position.BASE">BASE</option>
+                <option value="PIVOT" data-translate="baloncestoApp.Position.PIVOT">PIVOT</option>
+                <option value="ALA" data-translate="baloncestoApp.Position.ALA">ALA</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label data-translate="baloncestoApp.player.team" for="field_team">Team</label>
+            <select class="form-control" id="field_team" name="team" ng-model="vm.player.team" ng-options="team as team.name for team in vm.teams track by team.id">
+                <option value=""></option>
+            </select>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="vm.clear()">
+            <span class="glyphicon glyphicon-ban-circle"></span>&nbsp;<span data-translate="entity.action.cancel">Cancel</span>
+        </button>
+        <button type="submit" ng-disabled="editForm.$invalid || vm.isSaving" class="btn btn-primary">
+            <span class="glyphicon glyphicon-save"></span>&nbsp;<span data-translate="entity.action.save">Save</span>
+        </button>
+    </div>
+</form>

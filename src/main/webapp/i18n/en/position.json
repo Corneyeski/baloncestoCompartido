@@ -1,0 +1,11 @@
+{
+    "baloncestoApp": {
+        "Position" : {
+            "null": "",
+            "ALERO": "ALERO",
+            "BASE": "BASE",
+            "PIVOT": "PIVOT",
+            "ALA": "ALA"
+        }
+    }
+}

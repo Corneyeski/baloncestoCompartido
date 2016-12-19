@@ -1,0 +1,35 @@
+
+<div>
+    <h2><span data-translate="baloncestoApp.gameRating.detail.title">Game Rating</span> {{vm.gameRating.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span data-translate="baloncestoApp.gameRating.score">Score</span></dt>
+        <dd>
+            <span>{{vm.gameRating.score}}</span>
+        </dd>
+        <dt><span data-translate="baloncestoApp.gameRating.scoreDateTime">Score Date Time</span></dt>
+        <dd>
+            <span>{{vm.gameRating.scoreDateTime | date:'medium'}}</span>
+        </dd>
+        <dt><span data-translate="baloncestoApp.gameRating.user">User</span></dt>
+        <dd>
+            {{vm.gameRating.user.login}}
+        </dd>
+        <dt><span data-translate="baloncestoApp.gameRating.game">Game</span></dt>
+        <dd>
+            <a ui-sref="game-detail({id:vm.gameRating.game.id})">{{vm.gameRating.game.name}}</a>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            ui-sref="{{ vm.previousState }}"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span data-translate="entity.action.back"> Back</span>
+    </button>
+
+    <button type="button" ui-sref="game-rating-detail.edit({id:vm.gameRating.id})" class="btn btn-primary">
+        <span class="glyphicon glyphicon-pencil"></span>
+        <span class="hidden-xs hidden-sm" data-translate="entity.action.edit"> Edit</span>
+    </button>
+</div>

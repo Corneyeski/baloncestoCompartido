@@ -1,0 +1,25 @@
+{
+    "baloncestoApp": {
+        "gameRating" : {
+            "home": {
+                "title": "Game Ratings",
+                "createLabel": "Create a new Game Rating",
+                "createOrEditLabel": "Create or edit a Game Rating",
+                "search": "Search for Game Rating"
+            },
+            "created": "A new Game Rating is created with identifier {{ param }}",
+            "updated": "A Game Rating is updated with identifier {{ param }}",
+            "deleted": "A Game Rating is deleted with identifier {{ param }}",
+            "delete": {
+                "question": "Are you sure you want to delete Game Rating {{ id }}?"
+            },
+            "detail": {
+                "title": "Game Rating"
+            },
+            "score": "Score",
+            "scoreDateTime": "Score Date Time",
+            "user": "User",
+            "game": "Game"
+        }
+    }
+}

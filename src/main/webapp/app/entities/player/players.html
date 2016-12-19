@@ -1,0 +1,72 @@
+<div>
+    <h2 data-translate="baloncestoApp.player.home.title">Players</h2>
+    <jhi-alert></jhi-alert>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-4 no-padding-left">
+                <button class="btn btn-primary" ui-sref="player.new" >
+                    <span class="glyphicon glyphicon-plus"></span>
+                    <span  data-translate="baloncestoApp.player.home.createLabel">
+                        Create new Player
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <div class="table-responsive">
+        <table class="jh-table table table-striped">
+            <thead>
+                <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.reset()">
+                    <th jh-sort-by="id"><span data-translate="global.field.id">ID</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="name"><span data-translate="baloncestoApp.player.name">Name</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="surname"><span data-translate="baloncestoApp.player.surname">Surname</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="birthdate"><span data-translate="baloncestoApp.player.birthdate">Birthdate</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="numBaskets"><span data-translate="baloncestoApp.player.numBaskets">Num Baskets</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="numAssists"><span data-translate="baloncestoApp.player.numAssists">Num Assists</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="numRebounds"><span data-translate="baloncestoApp.player.numRebounds">Num Rebounds</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="position"><span data-translate="baloncestoApp.player.position">Position</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="team.name"><span data-translate="baloncestoApp.player.team">Team</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody infinite-scroll="vm.loadPage(vm.page + 1)" infinite-scroll-disabled="vm.page >= vm.links['last']">
+                <tr ng-repeat="player in vm.players track by player.id">
+                    <td><a ui-sref="player-detail({id:player.id})">{{player.id}}</a></td>
+                    <td>{{player.name}}</td>
+                    <td>{{player.surname}}</td>
+                        <td>{{player.birthdate | date:'mediumDate'}}</td>
+                    <td>{{player.numBaskets}}</td>
+                    <td>{{player.numAssists}}</td>
+                    <td>{{player.numRebounds}}</td>
+                    <td data-translate="{{'baloncestoApp.Position.' + player.position}}">{{player.position}}</td>
+                    <td>
+                        <a ui-sref="team-detail({id:player.team.id})">{{player.team.name}}</a>
+                    </td>
+                    <td class="text-right">
+                        <div class="btn-group flex-btn-group-container">
+                            <button type="submit"
+                                    ui-sref="player-detail({id:player.id})"
+                                    class="btn btn-info btn-sm">
+                                <span class="glyphicon glyphicon-eye-open"></span>
+                                <span class="hidden-xs hidden-sm" data-translate="entity.action.view"></span>
+                            </button>
+                            <button type="submit"
+                                    ui-sref="player.edit({id:player.id})"
+                                    class="btn btn-primary btn-sm">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                                <span class="hidden-xs hidden-sm" data-translate="entity.action.edit"></span>
+                            </button>
+                            <button type="submit"
+                                    ui-sref="player.delete({id:player.id})"
+                                    class="btn btn-danger btn-sm">
+                                <span class="glyphicon glyphicon-remove-circle"></span>
+                                <span class="hidden-xs hidden-sm" data-translate="entity.action.delete"></span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

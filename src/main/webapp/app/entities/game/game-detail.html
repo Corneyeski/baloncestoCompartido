@@ -1,0 +1,47 @@
+
+<div>
+    <h2><span data-translate="baloncestoApp.game.detail.title">Game</span> {{vm.game.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span data-translate="baloncestoApp.game.name">Name</span></dt>
+        <dd>
+            <span>{{vm.game.name}}</span>
+        </dd>
+        <dt><span data-translate="baloncestoApp.game.localScore">Local Score</span></dt>
+        <dd>
+            <span>{{vm.game.localScore}}</span>
+        </dd>
+        <dt><span data-translate="baloncestoApp.game.visitorScore">Visitor Score</span></dt>
+        <dd>
+            <span>{{vm.game.visitorScore}}</span>
+        </dd>
+        <dt><span data-translate="baloncestoApp.game.startTime">Start Time</span></dt>
+        <dd>
+            <span>{{vm.game.startTime | date:'mediumDate'}}</span>
+        </dd>
+        <dt><span data-translate="baloncestoApp.game.finishTime">Finish Time</span></dt>
+        <dd>
+            <span>{{vm.game.finishTime | date:'mediumDate'}}</span>
+        </dd>
+        <dt><span data-translate="baloncestoApp.game.localTeam">Local Team</span></dt>
+        <dd>
+            <a ui-sref="team-detail({id:vm.game.localTeam.id})">{{vm.game.localTeam.name}}</a>
+        </dd>
+        <dt><span data-translate="baloncestoApp.game.visitorTeam">Visitor Team</span></dt>
+        <dd>
+            <a ui-sref="team-detail({id:vm.game.visitorTeam.id})">{{vm.game.visitorTeam.name}}</a>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            ui-sref="{{ vm.previousState }}"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span data-translate="entity.action.back"> Back</span>
+    </button>
+
+    <button type="button" ui-sref="game-detail.edit({id:vm.game.id})" class="btn btn-primary">
+        <span class="glyphicon glyphicon-pencil"></span>
+        <span class="hidden-xs hidden-sm" data-translate="entity.action.edit"> Edit</span>
+    </button>
+</div>

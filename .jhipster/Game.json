@@ -1,0 +1,50 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipType": "many-to-one",
+            "relationshipName": "localTeam",
+            "otherEntityName": "team",
+            "otherEntityField": "name"
+        },
+        {
+            "relationshipType": "many-to-one",
+            "relationshipName": "visitorTeam",
+            "otherEntityName": "team",
+            "otherEntityField": "name"
+        },
+        {
+            "relationshipType": "one-to-many",
+            "relationshipName": "gameRating",
+            "otherEntityName": "gameRating",
+            "otherEntityRelationshipName": "game"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "name",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "localScore",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "visitorScore",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "startTime",
+            "fieldType": "LocalDate"
+        },
+        {
+            "fieldName": "finishTime",
+            "fieldType": "LocalDate"
+        }
+    ],
+    "changelogDate": "20161219194125",
+    "entityTableName": "game",
+    "dto": "no",
+    "pagination": "infinite-scroll",
+    "service": "serviceClass"
+}

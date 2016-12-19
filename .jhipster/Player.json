@@ -1,0 +1,53 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipType": "many-to-one",
+            "relationshipName": "team",
+            "otherEntityName": "team",
+            "otherEntityField": "name"
+        },
+        {
+            "relationshipType": "one-to-many",
+            "relationshipName": "favouritePlayer",
+            "otherEntityName": "favouritePlayer",
+            "otherEntityRelationshipName": "player"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "name",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "surname",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "birthdate",
+            "fieldType": "LocalDate"
+        },
+        {
+            "fieldName": "numBaskets",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "numAssists",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "numRebounds",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "position",
+            "fieldType": "Position",
+            "fieldValues": "ALERO,BASE,PIVOT,ALA"
+        }
+    ],
+    "changelogDate": "20161219194122",
+    "entityTableName": "player",
+    "dto": "no",
+    "pagination": "infinite-scroll",
+    "service": "serviceClass"
+}

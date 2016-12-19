@@ -1,0 +1,24 @@
+{
+    "baloncestoApp": {
+        "favouritePlayer" : {
+            "home": {
+                "title": "Favourite Players",
+                "createLabel": "Create a new Favourite Player",
+                "createOrEditLabel": "Create or edit a Favourite Player",
+                "search": "Search for Favourite Player"
+            },
+            "created": "A new Favourite Player is created with identifier {{ param }}",
+            "updated": "A Favourite Player is updated with identifier {{ param }}",
+            "deleted": "A Favourite Player is deleted with identifier {{ param }}",
+            "delete": {
+                "question": "Are you sure you want to delete Favourite Player {{ id }}?"
+            },
+            "detail": {
+                "title": "Favourite Player"
+            },
+            "favouriteDateTime": "Favourite Date Time",
+            "user": "User",
+            "player": "Player"
+        }
+    }
+}
