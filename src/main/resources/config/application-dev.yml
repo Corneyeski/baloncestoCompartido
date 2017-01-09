@@ -25,7 +25,7 @@ spring:
     datasource:
         type: com.zaxxer.hikari.HikariDataSource
         url: jdbc:mysql://localhost:3306/baloncesto?useUnicode=true&characterEncoding=utf8&useSSL=false
-        name:
+        name: baloncesto
         username: root
         password:
         hikari:
