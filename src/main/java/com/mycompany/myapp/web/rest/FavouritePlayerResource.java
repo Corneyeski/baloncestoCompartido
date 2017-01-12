@@ -199,32 +199,30 @@ public class FavouritePlayerResource {
 
     @GetMapping("/all-player-evolution")
     @Timed
-    public ResponseEntity<List<EvolutionDTO>> getAllPlayersEvolution()
+    public ResponseEntity<TreeMap<Long, TreeMap<LocalDate, Long>>> getAllPlayersEvolution()
         throws URISyntaxException {
 
         log.debug("REST request to get PlayerEvolution");
 
-        List<EvolutionDTO> result = new ArrayList<>();
+        TreeMap<Long, TreeMap<LocalDate, Long>> result = new TreeMap<>();
 
-        List<LocalDateTime> datesLDT = favouritePlayerRepository.getEvolution(1L);
-        List<LocalDate> dates = new ArrayList<>();
-        // pasamos de localdatetime a localdate
-        datesLDT.forEach(date -> dates.add(date.toLocalDate()));
-        // los agrupamos por fecha y nos guardamos cuántos hay en cada grupo
-        Map<LocalDate, Long> mapDates = dates.stream().
-            collect(Collectors.groupingBy(Function.identity(),
-                Collectors.counting()));
+        List<Player> players = playerRepository.findAll();
 
-        Map<LocalDate, Long> mapFinal = new LinkedHashMap<>();
-        // ordenamos por fecha
-        mapDates.entrySet().stream().sorted(Map.Entry.<LocalDate, Long>comparingByKey()).forEachOrdered(e->mapFinal.put(e.getKey(), e.getValue()));
+        players.forEach(player -> {
+            List<LocalDateTime> datesLDT = favouritePlayerRepository.getEvolution(player.getId());
+            List<LocalDate> dates = new ArrayList<>();
+            datesLDT.forEach(date -> dates.add(date.toLocalDate()));
+            // map para coger todas las fechas y cuántos likes en cada fecha
+            Map<LocalDate, Long> mapDates = dates.stream().
+                collect(Collectors.groupingBy(Function.identity(),
+                    Collectors.counting()));
+            // map para ordenar por fecha
+            TreeMap<LocalDate, Long> mapFinal = new TreeMap<>();
+            // ordenamos por fecha
+            mapDates.entrySet().stream().sorted(Map.Entry.<LocalDate, Long>comparingByKey()).forEachOrdered(e->mapFinal.put(e.getKey(), e.getValue()));
 
-        mapFinal.forEach((date, numFav) ->{
-            EvolutionDTO evolutionDTO = new EvolutionDTO();
-            evolutionDTO.setTime(date);
-            evolutionDTO.setNumFavorites(numFav);
+            result.put(player.getId(), mapFinal);
 
-            result.add(evolutionDTO);
         });
 
         return new ResponseEntity<>(result, HttpStatus.OK);

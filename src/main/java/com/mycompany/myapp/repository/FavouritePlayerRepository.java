@@ -31,4 +31,6 @@ public interface FavouritePlayerRepository extends JpaRepository<FavouritePlayer
         "where favouritePlayer.player.id = :favouriteId")
     List<LocalDateTime> getEvolution(@Param("favouriteId") Long favouriteId);
 
+
+
 }
