@@ -162,30 +162,26 @@ public class FavouritePlayerResource {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    // GET find evolution
-
-    @GetMapping("/player-evolution")
+    // GET evolution player id
+    @GetMapping("/player-evolution/{id}")
     @Timed
-    public ResponseEntity<List<EvolutionDTO>> getPlayerEvolution()
+    public ResponseEntity<List<EvolutionDTO>> getPlayerEvolution(@PathVariable Long id)
         throws URISyntaxException {
 
-        log.debug("REST request to get PlayerEvolution");
+        log.debug("REST request to get PlayerEvolution : {}", id);
 
         List<EvolutionDTO> result = new ArrayList<>();
 
-        List<LocalDateTime> datesLDT = favouritePlayerRepository.getEvolution(1L);
-        List<LocalDate> dates = new ArrayList<>();
-        // pasamos de localdatetime a localdate
-        datesLDT.forEach(date -> dates.add(date.toLocalDate()));
-        // los agrupamos por fecha y nos guardamos cuántos hay en cada grupo
-        Map<LocalDate, Long> mapDates = dates.stream().
+        List<LocalDateTime> datesLDT = favouritePlayerRepository.getEvolution(id);
+
+        Map<LocalDate, Long> mapFinal = datesLDT.stream().
+            map(date -> date.toLocalDate()).
+            sorted().
             collect(Collectors.groupingBy(Function.identity(),
-                Collectors.counting()));
+            Collectors.counting()));
 
-        Map<LocalDate, Long> mapFinal = new LinkedHashMap<>();
-        // ordenamos por fecha
-        mapDates.entrySet().stream().sorted(Map.Entry.<LocalDate, Long>comparingByKey()).forEachOrdered(e->mapFinal.put(e.getKey(), e.getValue()));
-
+        //mapFinal.entrySet().toArray();
+        //System.out.println(mapFinal);
         mapFinal.forEach((date, numFav) ->{
             EvolutionDTO evolutionDTO = new EvolutionDTO();
             evolutionDTO.setTime(date);
@@ -197,32 +193,28 @@ public class FavouritePlayerResource {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    // GET evolution all players
     @GetMapping("/all-player-evolution")
     @Timed
-    public ResponseEntity<TreeMap<Long, TreeMap<LocalDate, Long>>> getAllPlayersEvolution()
+    public ResponseEntity<TreeMap<Long, Map<LocalDate, Long>>> getAllPlayersEvolution()
         throws URISyntaxException {
 
         log.debug("REST request to get PlayerEvolution");
 
-        TreeMap<Long, TreeMap<LocalDate, Long>> result = new TreeMap<>();
+        TreeMap<Long, Map<LocalDate, Long>> result = new TreeMap<>();
 
         List<Player> players = playerRepository.findAll();
 
         players.forEach(player -> {
             List<LocalDateTime> datesLDT = favouritePlayerRepository.getEvolution(player.getId());
-            List<LocalDate> dates = new ArrayList<>();
-            datesLDT.forEach(date -> dates.add(date.toLocalDate()));
-            // map para coger todas las fechas y cuántos likes en cada fecha
-            Map<LocalDate, Long> mapDates = dates.stream().
+
+            Map<LocalDate, Long> mapDates = datesLDT.stream().
+                map(date -> date.toLocalDate()).
+                sorted().
                 collect(Collectors.groupingBy(Function.identity(),
-                    Collectors.counting()));
-            // map para ordenar por fecha
-            TreeMap<LocalDate, Long> mapFinal = new TreeMap<>();
-            // ordenamos por fecha
-            mapDates.entrySet().stream().sorted(Map.Entry.<LocalDate, Long>comparingByKey()).forEachOrdered(e->mapFinal.put(e.getKey(), e.getValue()));
+                Collectors.counting()));
 
-            result.put(player.getId(), mapFinal);
-
+            result.put(player.getId(), mapDates);
         });
 
         return new ResponseEntity<>(result, HttpStatus.OK);
