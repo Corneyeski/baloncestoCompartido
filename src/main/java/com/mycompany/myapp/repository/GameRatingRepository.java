@@ -1,6 +1,8 @@
 package com.mycompany.myapp.repository;
 
+import com.mycompany.myapp.domain.Game;
 import com.mycompany.myapp.domain.GameRating;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,5 +20,10 @@ public interface GameRatingRepository extends JpaRepository<GameRating,Long> {
 
     @Query("select avg(gameRating.score) from GameRating gameRating where gameRating.game.id = :gameId")
     Double findAverage(@Param("gameId") Long id);
+
+    @Query("select game from Game game, GameRating gameRating " +
+        "where game.id = gameRating.game.id " +
+        "order by gameRating.score desc")
+    List<Game> findTopFiveGames(Pageable pageable);
 
 }

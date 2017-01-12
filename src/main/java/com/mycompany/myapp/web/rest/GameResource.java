@@ -11,6 +11,7 @@ import com.mycompany.myapp.web.rest.util.PaginationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -102,6 +103,18 @@ public class GameResource {
         gameDTO.setAvgScore(media);
 
         return new ResponseEntity<>(gameDTO, HttpStatus.OK);
+    }
+
+
+    @GetMapping("/games/top-five-games")
+    @Timed
+    public ResponseEntity<List<Game>> getTopFiveGames() {
+        log.debug("REST request to get TopFiveGames");
+
+        Pageable topFive = new PageRequest(0, 5);
+        List<Game> topFiveGames = gameRatingRepository.findTopFiveGames(topFive);
+
+        return new ResponseEntity<>(topFiveGames, HttpStatus.OK);
     }
 
     @DeleteMapping("/games/{id}")
