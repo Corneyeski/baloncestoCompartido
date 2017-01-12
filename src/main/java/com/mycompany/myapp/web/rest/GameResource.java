@@ -2,7 +2,10 @@ package com.mycompany.myapp.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import com.mycompany.myapp.domain.Game;
+import com.mycompany.myapp.repository.FavouritePlayerRepository;
+import com.mycompany.myapp.repository.GameRatingRepository;
 import com.mycompany.myapp.service.GameService;
+import com.mycompany.myapp.service.dto.GameDTO;
 import com.mycompany.myapp.web.rest.util.HeaderUtil;
 import com.mycompany.myapp.web.rest.util.PaginationUtil;
 import org.slf4j.Logger;
@@ -17,7 +20,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -28,17 +34,12 @@ import java.util.Optional;
 public class GameResource {
 
     private final Logger log = LoggerFactory.getLogger(GameResource.class);
-        
+
     @Inject
     private GameService gameService;
+    @Inject
+    private GameRatingRepository gameRatingRepository;
 
-    /**
-     * POST  /games : Create a new game.
-     *
-     * @param game the game to create
-     * @return the ResponseEntity with status 201 (Created) and with body the new game, or with status 400 (Bad Request) if the game has already an ID
-     * @throws URISyntaxException if the Location URI syntax is incorrect
-     */
     @PostMapping("/games")
     @Timed
     public ResponseEntity<Game> createGame(@RequestBody Game game) throws URISyntaxException {
@@ -52,15 +53,6 @@ public class GameResource {
             .body(result);
     }
 
-    /**
-     * PUT  /games : Updates an existing game.
-     *
-     * @param game the game to update
-     * @return the ResponseEntity with status 200 (OK) and with body the updated game,
-     * or with status 400 (Bad Request) if the game is not valid,
-     * or with status 500 (Internal Server Error) if the game couldnt be updated
-     * @throws URISyntaxException if the Location URI syntax is incorrect
-     */
     @PutMapping("/games")
     @Timed
     public ResponseEntity<Game> updateGame(@RequestBody Game game) throws URISyntaxException {
@@ -74,13 +66,6 @@ public class GameResource {
             .body(result);
     }
 
-    /**
-     * GET  /games : get all the games.
-     *
-     * @param pageable the pagination information
-     * @return the ResponseEntity with status 200 (OK) and the list of games in body
-     * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
-     */
     @GetMapping("/games")
     @Timed
     public ResponseEntity<List<Game>> getAllGames(Pageable pageable)
@@ -91,12 +76,6 @@ public class GameResource {
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
 
-    /**
-     * GET  /games/:id : get the "id" game.
-     *
-     * @param id the id of the game to retrieve
-     * @return the ResponseEntity with status 200 (OK) and with body the game, or with status 404 (Not Found)
-     */
     @GetMapping("/games/{id}")
     @Timed
     public ResponseEntity<Game> getGame(@PathVariable Long id) {
@@ -109,12 +88,22 @@ public class GameResource {
             .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    /**
-     * DELETE  /games/:id : delete the "id" game.
-     *
-     * @param id the id of the game to delete
-     * @return the ResponseEntity with status 200 (OK)
-     */
+    /* Devolver la información del partido y la media de las valoraciones que los usuarios
+    han efectuado sobre ese partido, a partir del identificador del partido. */
+    @GetMapping("/games/game-rating/{id}")
+    @Timed
+    public ResponseEntity<GameDTO> getGameRating(@PathVariable Long id) {
+        log.debug("REST request to get GameRating : {}", id);
+        Game game = gameService.findOne(id);
+        Double media = gameRatingRepository.findAverage(id);
+
+        GameDTO gameDTO = new GameDTO();
+        gameDTO.setGame(game);
+        gameDTO.setAvgScore(media);
+
+        return new ResponseEntity<>(gameDTO, HttpStatus.OK);
+    }
+
     @DeleteMapping("/games/{id}")
     @Timed
     public ResponseEntity<Void> deleteGame(@PathVariable Long id) {

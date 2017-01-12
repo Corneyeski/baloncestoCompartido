@@ -28,17 +28,10 @@ import java.util.Optional;
 public class GameRatingResource {
 
     private final Logger log = LoggerFactory.getLogger(GameRatingResource.class);
-        
+
     @Inject
     private GameRatingService gameRatingService;
 
-    /**
-     * POST  /game-ratings : Create a new gameRating.
-     *
-     * @param gameRating the gameRating to create
-     * @return the ResponseEntity with status 201 (Created) and with body the new gameRating, or with status 400 (Bad Request) if the gameRating has already an ID
-     * @throws URISyntaxException if the Location URI syntax is incorrect
-     */
     @PostMapping("/game-ratings")
     @Timed
     public ResponseEntity<GameRating> createGameRating(@RequestBody GameRating gameRating) throws URISyntaxException {
@@ -52,15 +45,6 @@ public class GameRatingResource {
             .body(result);
     }
 
-    /**
-     * PUT  /game-ratings : Updates an existing gameRating.
-     *
-     * @param gameRating the gameRating to update
-     * @return the ResponseEntity with status 200 (OK) and with body the updated gameRating,
-     * or with status 400 (Bad Request) if the gameRating is not valid,
-     * or with status 500 (Internal Server Error) if the gameRating couldnt be updated
-     * @throws URISyntaxException if the Location URI syntax is incorrect
-     */
     @PutMapping("/game-ratings")
     @Timed
     public ResponseEntity<GameRating> updateGameRating(@RequestBody GameRating gameRating) throws URISyntaxException {
@@ -74,13 +58,6 @@ public class GameRatingResource {
             .body(result);
     }
 
-    /**
-     * GET  /game-ratings : get all the gameRatings.
-     *
-     * @param pageable the pagination information
-     * @return the ResponseEntity with status 200 (OK) and the list of gameRatings in body
-     * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
-     */
     @GetMapping("/game-ratings")
     @Timed
     public ResponseEntity<List<GameRating>> getAllGameRatings(Pageable pageable)
@@ -91,12 +68,6 @@ public class GameRatingResource {
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
 
-    /**
-     * GET  /game-ratings/:id : get the "id" gameRating.
-     *
-     * @param id the id of the gameRating to retrieve
-     * @return the ResponseEntity with status 200 (OK) and with body the gameRating, or with status 404 (Not Found)
-     */
     @GetMapping("/game-ratings/{id}")
     @Timed
     public ResponseEntity<GameRating> getGameRating(@PathVariable Long id) {
@@ -109,12 +80,6 @@ public class GameRatingResource {
             .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    /**
-     * DELETE  /game-ratings/:id : delete the "id" gameRating.
-     *
-     * @param id the id of the gameRating to delete
-     * @return the ResponseEntity with status 200 (OK)
-     */
     @DeleteMapping("/game-ratings/{id}")
     @Timed
     public ResponseEntity<Void> deleteGameRating(@PathVariable Long id) {
