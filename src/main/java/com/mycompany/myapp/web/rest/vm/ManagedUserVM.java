@@ -1,12 +1,11 @@
 package com.mycompany.myapp.web.rest.vm;
 
-import java.time.ZonedDateTime;
-
-import java.util.Set;
-
 import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.service.dto.UserDTO;
+
 import javax.validation.constraints.Size;
+import java.time.ZonedDateTime;
+import java.util.Set;
 
 /**
  * View Model extending the UserDTO, which is meant to be used in the user management UI.

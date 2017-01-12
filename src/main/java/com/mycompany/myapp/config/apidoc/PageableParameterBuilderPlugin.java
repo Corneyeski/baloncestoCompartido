@@ -1,9 +1,9 @@
 package com.mycompany.myapp.config.apidoc;
 
-import com.mycompany.myapp.config.Constants;
 import com.fasterxml.classmate.ResolvedType;
 import com.fasterxml.classmate.TypeResolver;
 import com.google.common.base.Function;
+import com.mycompany.myapp.config.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;

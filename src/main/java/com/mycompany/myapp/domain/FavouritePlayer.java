@@ -3,7 +3,7 @@ package com.mycompany.myapp.domain;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
@@ -20,7 +20,7 @@ public class FavouritePlayer implements Serializable {
     private Long id;
 
     @Column(name = "favourite_date_time")
-    private ZonedDateTime favouriteDateTime;
+    private LocalDateTime favouriteDateTime;
 
     @ManyToOne
     private User user;
@@ -36,16 +36,16 @@ public class FavouritePlayer implements Serializable {
         this.id = id;
     }
 
-    public ZonedDateTime getFavouriteDateTime() {
+    public LocalDateTime getFavouriteDateTime() {
         return favouriteDateTime;
     }
 
-    public FavouritePlayer favouriteDateTime(ZonedDateTime favouriteDateTime) {
+    public FavouritePlayer favouriteDateTime(LocalDateTime favouriteDateTime) {
         this.favouriteDateTime = favouriteDateTime;
         return this;
     }
 
-    public void setFavouriteDateTime(ZonedDateTime favouriteDateTime) {
+    public void setFavouriteDateTime(LocalDateTime favouriteDateTime) {
         this.favouriteDateTime = favouriteDateTime;
     }
 

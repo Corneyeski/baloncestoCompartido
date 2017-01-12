@@ -1,19 +1,18 @@
 package com.mycompany.myapp.web.rest;
 
 import com.mycompany.myapp.service.AuditEventService;
-
-import java.time.LocalDate;
 import com.mycompany.myapp.web.rest.util.PaginationUtil;
 import org.springframework.boot.actuate.audit.AuditEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import java.net.URISyntaxException;
 import javax.inject.Inject;
+import java.net.URISyntaxException;
+import java.time.LocalDate;
 import java.util.List;
 
 /**

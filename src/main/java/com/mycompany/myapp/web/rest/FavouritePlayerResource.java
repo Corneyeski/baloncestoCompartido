@@ -5,9 +5,11 @@ import com.mycompany.myapp.domain.FavouritePlayer;
 import com.mycompany.myapp.domain.Player;
 import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.repository.FavouritePlayerRepository;
+import com.mycompany.myapp.repository.PlayerRepository;
 import com.mycompany.myapp.repository.UserRepository;
 import com.mycompany.myapp.security.SecurityUtils;
 import com.mycompany.myapp.service.FavouritePlayerService;
+import com.mycompany.myapp.service.dto.EvolutionDTO;
 import com.mycompany.myapp.service.dto.PlayerDTO;
 import com.mycompany.myapp.web.rest.util.HeaderUtil;
 import com.mycompany.myapp.web.rest.util.PaginationUtil;
@@ -24,10 +26,11 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * REST controller for managing FavouritePlayer.
@@ -40,12 +43,12 @@ public class FavouritePlayerResource {
 
     @Inject
     private FavouritePlayerService favouritePlayerService;
-
     @Inject
     private UserRepository userRepository;
-
     @Inject
     private FavouritePlayerRepository favouritePlayerRepository;
+    @Inject
+    private PlayerRepository playerRepository;
 
     // POST
     @PostMapping("/favourite-players")
@@ -57,7 +60,7 @@ public class FavouritePlayerResource {
         }
 
         User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
-        ZonedDateTime now = ZonedDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
 
         favouritePlayer.setUser(user);
         favouritePlayer.setFavouriteDateTime(now);
@@ -155,6 +158,74 @@ public class FavouritePlayerResource {
             }
 
         );
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    // GET find evolution
+
+    @GetMapping("/player-evolution")
+    @Timed
+    public ResponseEntity<List<EvolutionDTO>> getPlayerEvolution()
+        throws URISyntaxException {
+
+        log.debug("REST request to get PlayerEvolution");
+
+        List<EvolutionDTO> result = new ArrayList<>();
+
+        List<LocalDateTime> datesLDT = favouritePlayerRepository.getEvolution(1L);
+        List<LocalDate> dates = new ArrayList<>();
+        // pasamos de localdatetime a localdate
+        datesLDT.forEach(date -> dates.add(date.toLocalDate()));
+        // los agrupamos por fecha y nos guardamos cuántos hay en cada grupo
+        Map<LocalDate, Long> mapDates = dates.stream().
+            collect(Collectors.groupingBy(Function.identity(),
+                Collectors.counting()));
+
+        Map<LocalDate, Long> mapFinal = new LinkedHashMap<>();
+        // ordenamos por fecha
+        mapDates.entrySet().stream().sorted(Map.Entry.<LocalDate, Long>comparingByKey()).forEachOrdered(e->mapFinal.put(e.getKey(), e.getValue()));
+
+        mapFinal.forEach((date, numFav) ->{
+            EvolutionDTO evolutionDTO = new EvolutionDTO();
+            evolutionDTO.setTime(date);
+            evolutionDTO.setNumFavorites(numFav);
+
+            result.add(evolutionDTO);
+        });
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @GetMapping("/all-player-evolution")
+    @Timed
+    public ResponseEntity<List<EvolutionDTO>> getAllPlayersEvolution()
+        throws URISyntaxException {
+
+        log.debug("REST request to get PlayerEvolution");
+
+        List<EvolutionDTO> result = new ArrayList<>();
+
+        List<LocalDateTime> datesLDT = favouritePlayerRepository.getEvolution(1L);
+        List<LocalDate> dates = new ArrayList<>();
+        // pasamos de localdatetime a localdate
+        datesLDT.forEach(date -> dates.add(date.toLocalDate()));
+        // los agrupamos por fecha y nos guardamos cuántos hay en cada grupo
+        Map<LocalDate, Long> mapDates = dates.stream().
+            collect(Collectors.groupingBy(Function.identity(),
+                Collectors.counting()));
+
+        Map<LocalDate, Long> mapFinal = new LinkedHashMap<>();
+        // ordenamos por fecha
+        mapDates.entrySet().stream().sorted(Map.Entry.<LocalDate, Long>comparingByKey()).forEachOrdered(e->mapFinal.put(e.getKey(), e.getValue()));
+
+        mapFinal.forEach((date, numFav) ->{
+            EvolutionDTO evolutionDTO = new EvolutionDTO();
+            evolutionDTO.setTime(date);
+            evolutionDTO.setNumFavorites(numFav);
+
+            result.add(evolutionDTO);
+        });
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

@@ -1,15 +1,14 @@
 package com.mycompany.myapp.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.mycompany.myapp.domain.enumeration.Position;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.Objects;
-
-import com.mycompany.myapp.domain.enumeration.Position;
+import java.util.Set;
 
 /**
  * A Player.

@@ -6,11 +6,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.List;
 
 /**
  * Service Implementation for managing Team.
@@ -20,7 +19,7 @@ import java.util.List;
 public class TeamService {
 
     private final Logger log = LoggerFactory.getLogger(TeamService.class);
-    
+
     @Inject
     private TeamRepository teamRepository;
 
@@ -38,11 +37,11 @@ public class TeamService {
 
     /**
      *  Get all the teams.
-     *  
+     *
      *  @param pageable the pagination information
      *  @return the list of entities
      */
-    @Transactional(readOnly = true) 
+    @Transactional(readOnly = true)
     public Page<Team> findAll(Pageable pageable) {
         log.debug("Request to get all Teams");
         Page<Team> result = teamRepository.findAll(pageable);
@@ -55,7 +54,7 @@ public class TeamService {
      *  @param id the id of the entity
      *  @return the entity
      */
-    @Transactional(readOnly = true) 
+    @Transactional(readOnly = true)
     public Team findOne(Long id) {
         log.debug("Request to get Team : {}", id);
         Team team = teamRepository.findOne(id);
