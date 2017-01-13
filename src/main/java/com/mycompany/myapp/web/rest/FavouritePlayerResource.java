@@ -117,22 +117,20 @@ public class FavouritePlayerResource {
 
         log.debug("REST request to get TopPlayers");
 
-        List<Object[]> topPlayers = favouritePlayerRepository.findTopPlayers();
+        /*List<Object[]> topPlayers = favouritePlayerRepository.findTopPlayers();
 
-        List<PlayerDTO> result = new ArrayList<>();
-
-        topPlayers.forEach(
-            topPlayer -> {
-                PlayerDTO p = new PlayerDTO();
-                p.setPlayer((Player) topPlayer[0]);
-                p.setNumFavs((Long) topPlayer[1]);
-
-                result.add(p);
-            }
-
-        );
+        List <PlayerDTO> result = topPlayers.stream().map(player ->
+            new PlayerDTO((Player) player[0], (Long) player[1])).
+            collect(Collectors.toList());
 
         return new ResponseEntity<>(result, HttpStatus.OK);
+        */
+
+        // Lo mismo que lo comentado en una línea
+        return new ResponseEntity<>(
+            favouritePlayerRepository.findTopPlayers().stream().map(player ->
+                new PlayerDTO((Player) player[0], (Long) player[1])).
+                collect(Collectors.toList()), HttpStatus.OK);
     }
 
     // GET top five

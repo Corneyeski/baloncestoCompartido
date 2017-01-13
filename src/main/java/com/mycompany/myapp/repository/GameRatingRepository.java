@@ -21,9 +21,9 @@ public interface GameRatingRepository extends JpaRepository<GameRating,Long> {
     @Query("select avg(gameRating.score) from GameRating gameRating where gameRating.game.id = :gameId")
     Double findAverage(@Param("gameId") Long id);
 
-    @Query("select game from Game game, GameRating gameRating " +
-        "where game.id = gameRating.game.id " +
-        "order by gameRating.score desc")
-    List<Game> findTopFiveGames(Pageable pageable);
-
+    @Query("select gameRating.game, avg(gameRating.score) " +
+        "from GameRating gameRating " +
+        "group by gameRating.game "+
+        "order by avg(gameRating.score) desc")
+    List<Object[]> findTopFiveGames(Pageable pageable);
 }

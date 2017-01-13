@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * REST controller for managing Game.
@@ -89,8 +90,6 @@ public class GameResource {
             .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    /* Devolver la información del partido y la media de las valoraciones que los usuarios
-    han efectuado sobre ese partido, a partir del identificador del partido. */
     @GetMapping("/games/game-rating/{id}")
     @Timed
     public ResponseEntity<GameDTO> getGameRating(@PathVariable Long id) {
@@ -108,13 +107,17 @@ public class GameResource {
 
     @GetMapping("/games/top-five-games")
     @Timed
-    public ResponseEntity<List<Game>> getTopFiveGames() {
+    public ResponseEntity<List<GameDTO>> getTopFiveGames() {
         log.debug("REST request to get TopFiveGames");
 
-        Pageable topFive = new PageRequest(0, 5);
-        List<Game> topFiveGames = gameRatingRepository.findTopFiveGames(topFive);
+        List<Object[]> topFiveGames = gameRatingRepository.findTopFiveGames(new PageRequest(0, 5));
 
-        return new ResponseEntity<>(topFiveGames, HttpStatus.OK);
+        List<GameDTO> result = topFiveGames.
+            stream().
+            map(game -> new GameDTO((Game) game[0], (Double) game[1])).
+            collect(Collectors.toList());
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @DeleteMapping("/games/{id}")
