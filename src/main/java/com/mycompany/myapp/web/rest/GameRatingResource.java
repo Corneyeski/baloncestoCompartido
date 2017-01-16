@@ -2,6 +2,7 @@ package com.mycompany.myapp.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import com.mycompany.myapp.domain.GameRating;
+import com.mycompany.myapp.repository.GameRatingRepository;
 import com.mycompany.myapp.service.GameRatingService;
 import com.mycompany.myapp.web.rest.util.HeaderUtil;
 import com.mycompany.myapp.web.rest.util.PaginationUtil;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +34,8 @@ public class GameRatingResource {
 
     @Inject
     private GameRatingService gameRatingService;
+    @Inject
+    private GameRatingRepository gameRatingRepository;
 
     @PostMapping("/game-ratings")
     @Timed
@@ -39,10 +44,27 @@ public class GameRatingResource {
         if (gameRating.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("gameRating", "idexists", "A new gameRating cannot already have an ID")).body(null);
         }
-        GameRating result = gameRatingService.save(gameRating);
+
+        ZonedDateTime now = ZonedDateTime.now();
+
+        GameRating game = gameRatingRepository.getRating(gameRating.getUser().getId(), gameRating.getGame().getId());
+        GameRating result;
+
+        if(game == null){
+            gameRating.setScoreDateTime(now);
+            result = gameRatingService.save(gameRating);
+
+        }else{
+            //aqui el put
+            GameRating aux = new GameRating(gameRating.getScore(), now, game.getUser(), game.getGame());
+            gameRatingService.delete(game.getId());
+            result = gameRatingService.save(aux);
+        }
+
         return ResponseEntity.created(new URI("/api/game-ratings/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert("gameRating", result.getId().toString()))
             .body(result);
+
     }
 
     @PutMapping("/game-ratings")

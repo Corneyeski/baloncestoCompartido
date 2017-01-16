@@ -65,6 +65,7 @@ public class FavouritePlayerResource {
         favouritePlayer.setUser(user);
         favouritePlayer.setFavouriteDateTime(now);
 
+
         FavouritePlayer result = favouritePlayerService.save(favouritePlayer);
         return ResponseEntity.created(new URI("/api/favourite-players/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert("favouritePlayer", result.getId().toString()))
@@ -142,20 +143,11 @@ public class FavouritePlayerResource {
         log.debug("REST request to get TopFivePlayers");
 
         Pageable topFive = new PageRequest(0, 5);
-        List<Object[]> topFivePlayers = favouritePlayerRepository.findTopFivePlayers(topFive);
 
-        List<PlayerDTO> result = new ArrayList<>();
-
-        topFivePlayers.forEach(
-            topPlayer -> {
-                PlayerDTO p = new PlayerDTO();
-                p.setPlayer((Player) topPlayer[0]);
-                p.setNumFavs((Long) topPlayer[1]);
-
-                result.add(p);
-            }
-
-        );
+        List<PlayerDTO> result = favouritePlayerRepository.findTopFivePlayers(topFive).
+            stream().
+            map(player -> new PlayerDTO((Player) player[0], (Long) player[1])).
+            collect(Collectors.toList());
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -178,8 +170,6 @@ public class FavouritePlayerResource {
             collect(Collectors.groupingBy(Function.identity(),
             Collectors.counting()));
 
-        //mapFinal.entrySet().toArray();
-        //System.out.println(mapFinal);
         mapFinal.forEach((date, numFav) ->{
             EvolutionDTO evolutionDTO = new EvolutionDTO();
             evolutionDTO.setTime(date);

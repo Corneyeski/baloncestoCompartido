@@ -31,6 +31,16 @@ public class GameRating implements Serializable {
     @ManyToOne
     private Game game;
 
+    public GameRating() {
+    }
+
+    public GameRating(Integer score, ZonedDateTime scoreDateTime, User user, Game game) {
+        this.score = score;
+        this.scoreDateTime = scoreDateTime;
+        this.user = user;
+        this.game = game;
+    }
+
     public Long getId() {
         return id;
     }

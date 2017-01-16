@@ -19,7 +19,7 @@ public interface FavouritePlayerRepository extends JpaRepository<FavouritePlayer
     List<FavouritePlayer> findByUserIsCurrentUser();
 
     @Query("select favouritePlayer.player, count(favouritePlayer) from FavouritePlayer favouritePlayer " +
-          "group by favouritePlayer.player order by count(favouritePlayer) desc ")
+        "group by favouritePlayer.player order by count(favouritePlayer) desc ")
     List<Object[]> findTopPlayers();
 
     @Query("select favouritePlayer.player, count(favouritePlayer) from FavouritePlayer favouritePlayer " +
@@ -30,7 +30,5 @@ public interface FavouritePlayerRepository extends JpaRepository<FavouritePlayer
         "from FavouritePlayer favouritePlayer " +
         "where favouritePlayer.player.id = :favouriteId")
     List<LocalDateTime> getEvolution(@Param("favouriteId") Long favouriteId);
-
-
 
 }
