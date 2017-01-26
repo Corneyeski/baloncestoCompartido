@@ -49,9 +49,10 @@
                                 <span class="glyphicon glyphicon-pencil"></span>
                                 <span class="hidden-xs hidden-sm" data-translate="entity.action.edit"></span>
                             </button>
+                            <!--Add restricción para que solo admin puedan modificar-->
                             <button type="submit"
                                     ui-sref="favourite-player.delete({id:favouritePlayer.id})"
-                                    class="btn btn-danger btn-sm">
+                                    class="btn btn-danger btn-sm" has-authority="ROLE_ADMIN">
                                 <span class="glyphicon glyphicon-remove-circle"></span>
                                 <span class="hidden-xs hidden-sm" data-translate="entity.action.delete"></span>
                             </button>

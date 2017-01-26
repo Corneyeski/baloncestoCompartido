@@ -49,7 +49,7 @@ public class GameRatingResource {
 
         GameRating game = gameRatingRepository.getRating(gameRating.getUser().getId(), gameRating.getGame().getId());
         GameRating result;
-
+        // si no hay ninguna puntuación a ese partido con ese usuario
         if(game == null){
             gameRating.setScoreDateTime(now);
             result = gameRatingService.save(gameRating);
@@ -64,7 +64,6 @@ public class GameRatingResource {
         return ResponseEntity.created(new URI("/api/game-ratings/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert("gameRating", result.getId().toString()))
             .body(result);
-
     }
 
     @PutMapping("/game-ratings")

@@ -45,7 +45,8 @@
             }
 
             function onError(error) {
-                AlertService.error(error.data.message);
+                //AlertService.error(error.data.message);
+                AlertService.error("User role non correct");
             }
         }
 

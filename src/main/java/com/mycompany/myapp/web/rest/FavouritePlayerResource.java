@@ -7,6 +7,7 @@ import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.repository.FavouritePlayerRepository;
 import com.mycompany.myapp.repository.PlayerRepository;
 import com.mycompany.myapp.repository.UserRepository;
+import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.security.SecurityUtils;
 import com.mycompany.myapp.service.FavouritePlayerService;
 import com.mycompany.myapp.service.dto.EvolutionDTO;
@@ -56,20 +57,21 @@ public class FavouritePlayerResource {
     public ResponseEntity<FavouritePlayer> createFavouritePlayer(@RequestBody FavouritePlayer favouritePlayer) throws URISyntaxException {
         log.debug("REST request to save FavouritePlayer : {}", favouritePlayer);
         if (favouritePlayer.getId() != null) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("favouritePlayer", "idexists", "A new favouritePlayer cannot already have an ID")).body(null);
+            return ResponseEntity.badRequest().headers(HeaderUtil.
+                createFailureAlert("favouritePlayer", "idexists", "A new favouritePlayer cannot already have an ID")).body(null);
         }
 
-        User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
-        LocalDateTime now = LocalDateTime.now();
+            //User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
+            User user = favouritePlayer.getUser();
 
-        favouritePlayer.setUser(user);
-        favouritePlayer.setFavouriteDateTime(now);
+            favouritePlayer.setUser(user);
+            favouritePlayer.setFavouriteDateTime(LocalDateTime.now());
 
+            FavouritePlayer result = favouritePlayerService.save(favouritePlayer);
 
-        FavouritePlayer result = favouritePlayerService.save(favouritePlayer);
-        return ResponseEntity.created(new URI("/api/favourite-players/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert("favouritePlayer", result.getId().toString()))
-            .body(result);
+            return ResponseEntity.created(new URI("/api/favourite-players/" + result.getId()))
+                .headers(HeaderUtil.createEntityCreationAlert("favouritePlayer", result.getId().toString()))
+                .body(result);
     }
 
     // PUT
@@ -184,12 +186,12 @@ public class FavouritePlayerResource {
     // GET evolution all players
     @GetMapping("/all-player-evolution")
     @Timed
-    public ResponseEntity<TreeMap<Long, Map<LocalDate, Long>>> getAllPlayersEvolution()
+    public ResponseEntity<TreeMap<Player, Map<LocalDate, Long>>> getAllPlayersEvolution()
         throws URISyntaxException {
 
         log.debug("REST request to get PlayerEvolution");
 
-        TreeMap<Long, Map<LocalDate, Long>> result = new TreeMap<>();
+        TreeMap<Player, Map<LocalDate, Long>> result = new TreeMap<>();
 
         List<Player> players = playerRepository.findAll();
 
@@ -202,7 +204,9 @@ public class FavouritePlayerResource {
                 collect(Collectors.groupingBy(Function.identity(),
                 Collectors.counting()));
 
-            result.put(player.getId(), mapDates);
+            Player p = playerRepository.findPlayerById(player.getId());
+
+            result.put(p, mapDates);
         });
 
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -213,6 +217,12 @@ public class FavouritePlayerResource {
     @Timed
     public ResponseEntity<Void> deleteFavouritePlayer(@PathVariable Long id) {
         log.debug("REST request to delete FavouritePlayer : {}", id);
+
+        if (!SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN)) {
+            log.debug("No user passed in, using current user: {}",
+                SecurityUtils.getCurrentUserLogin());
+        }
+
         favouritePlayerService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("favouritePlayer", id.toString())).build();
     }
