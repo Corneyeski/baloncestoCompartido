@@ -167,14 +167,14 @@ public class FavouritePlayerResource {
         List<LocalDateTime> datesLDT = favouritePlayerRepository.getEvolution(id);
 
         Map<LocalDate, Long> mapFinal = datesLDT.stream().
-            map(date -> date.toLocalDate()).
+            map(dateTime -> dateTime.toLocalDate()).
             sorted().
             collect(Collectors.groupingBy(Function.identity(),
             Collectors.counting()));
 
         mapFinal.forEach((date, numFav) ->{
             EvolutionDTO evolutionDTO = new EvolutionDTO();
-            evolutionDTO.setTime(date);
+            evolutionDTO.setDate(date);
             evolutionDTO.setNumFavorites(numFav);
 
             result.add(evolutionDTO);
@@ -199,7 +199,7 @@ public class FavouritePlayerResource {
             List<LocalDateTime> datesLDT = favouritePlayerRepository.getEvolution(player.getId());
 
             Map<LocalDate, Long> mapDates = datesLDT.stream().
-                map(date -> date.toLocalDate()).
+                map(dateTime -> dateTime.toLocalDate()).
                 sorted().
                 collect(Collectors.groupingBy(Function.identity(),
                 Collectors.counting()));
