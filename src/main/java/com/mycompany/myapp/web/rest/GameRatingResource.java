@@ -23,6 +23,8 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
+//TODO Arnau control de errores
+
 /**
  * REST controller for managing GameRating.
  */
@@ -109,4 +111,6 @@ public class GameRatingResource {
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("gameRating", id.toString())).build();
     }
 
+    //TODO Alan partido por id y la media de las valoraciones
+    //TODO Alfredo top-five partidos
 }

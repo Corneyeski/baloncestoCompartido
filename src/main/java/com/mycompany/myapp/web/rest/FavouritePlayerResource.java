@@ -33,6 +33,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+//TODO Arnau control de errores
+
 /**
  * REST controller for managing FavouritePlayer.
  */
@@ -111,7 +113,7 @@ public class FavouritePlayerResource {
                 HttpStatus.OK))
             .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
-
+    //TODO - Alfredo
     // GET top players
     @GetMapping("/top-players")
     @Timed
@@ -135,7 +137,7 @@ public class FavouritePlayerResource {
                 new PlayerDTO((Player) player[0], (Long) player[1])).
                 collect(Collectors.toList()), HttpStatus.OK);
     }
-
+    //TODO - Alfredo
     // GET top five
     @GetMapping("/top-five")
     @Timed
@@ -153,7 +155,7 @@ public class FavouritePlayerResource {
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
-
+    //TODO - Alan/Cris
     // GET evolution player id
     @GetMapping("/player-evolution/{id}")
     @Timed
@@ -183,6 +185,7 @@ public class FavouritePlayerResource {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    //TODO - Alan/Cris
     // GET evolution all players
     @GetMapping("/all-player-evolution")
     @Timed
