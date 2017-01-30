@@ -61,8 +61,8 @@ public class FavouritePlayerResource {
                 createFailureAlert("favouritePlayer", "idexists", "A new favouritePlayer cannot already have an ID")).body(null);
         }
 
-            //User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
-            User user = favouritePlayer.getUser();
+            User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
+            //User user = favouritePlayer.getUser();
 
             favouritePlayer.setUser(user);
             favouritePlayer.setFavouriteDateTime(LocalDateTime.now());
