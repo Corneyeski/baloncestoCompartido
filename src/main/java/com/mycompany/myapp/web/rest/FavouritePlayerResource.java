@@ -62,7 +62,7 @@ public class FavouritePlayerResource {
             return ResponseEntity.badRequest().headers(HeaderUtil.
                 createFailureAlert("favouritePlayer", "idexists", "A new favouritePlayer cannot already have an ID")).body(null);
         }
-
+            //TODO Falta integrar el control de errores de Arnau
             User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
             //User user = favouritePlayer.getUser();
 

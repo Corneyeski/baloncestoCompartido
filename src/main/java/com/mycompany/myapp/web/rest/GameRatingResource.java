@@ -3,7 +3,11 @@ package com.mycompany.myapp.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import com.mycompany.myapp.domain.GameRating;
 import com.mycompany.myapp.repository.GameRatingRepository;
+import com.mycompany.myapp.repository.GameRepository;
+import com.mycompany.myapp.repository.UserRepository;
+import com.mycompany.myapp.security.SecurityUtils;
 import com.mycompany.myapp.service.GameRatingService;
+import com.mycompany.myapp.service.GameService;
 import com.mycompany.myapp.web.rest.util.HeaderUtil;
 import com.mycompany.myapp.web.rest.util.PaginationUtil;
 import org.slf4j.Logger;
@@ -36,37 +40,67 @@ public class GameRatingResource {
 
     @Inject
     private GameRatingService gameRatingService;
+
+    @Inject
+    private GameRepository gameRepository;
+
     @Inject
     private GameRatingRepository gameRatingRepository;
+
+    @Inject
+    private UserRepository userRepository;
+
+    @Inject
+    private GameService gameService;
 
     @PostMapping("/game-ratings")
     @Timed
     public ResponseEntity<GameRating> createGameRating(@RequestBody GameRating gameRating) throws URISyntaxException {
         log.debug("REST request to save GameRating : {}", gameRating);
         if (gameRating.getId() != null) {
+            //Comprobamos si el id de la valoracion existe, si existe regresamos un Failure Alert
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("gameRating", "idexists", "A new gameRating cannot already have an ID")).body(null);
         }
 
-        ZonedDateTime now = ZonedDateTime.now();
-
-        GameRating game = gameRatingRepository.getRating(gameRating.getUser().getId(), gameRating.getGame().getId());
-        GameRating result;
-        // si no hay ninguna puntuación a ese partido con ese usuario
-        if(game == null){
-            gameRating.setScoreDateTime(now);
-            result = gameRatingService.save(gameRating);
-
-        }else{
-            //aqui el put
-            GameRating aux = new GameRating(gameRating.getScore(), now, game.getUser(), game.getGame());
-            gameRatingService.delete(game.getId());
-            result = gameRatingService.save(aux);
+        if(gameRepository.findOne(gameRating.getGame().getId())==null){
+            //Comprobamos si el objeto gameRating existe, si no existe regresamos un 403 bad request
+            return ResponseEntity.badRequest().
+                headers(HeaderUtil.createFailureAlert("gameRating","gameNotExistant","Game doesn't exists")).body(null);
         }
 
-        return ResponseEntity.created(new URI("/api/game-ratings/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert("gameRating", result.getId().toString()))
-            .body(result);
+        gameRating.setUser(userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get());
+        //Colocamos dentro del gameRating que pasamos EL USUARIO QUE ESTA LOGGEADO
+        gameRating.setScoreDateTime(ZonedDateTime.now());
+        //Le colocamos el tiempo de hoy, ya que bien vaya a actualizar o crear, será hoy cuando lo haga
+
+        Optional<GameRating> gameRatingOptional = gameRatingRepository.findByUserAndGame(gameRating.getUser(),gameRating.getGame());
+
+        //buscamos una valoracion de ese usuario y del juego que pasamos por parametro
+        //Lo envolvemos en un Optional porque puede regresar un valor o un null
+        //OJO dentro del repository la consulta tambien debe tener un Optional
+
+        GameRating result = null;
+
+        if(gameRatingOptional.isPresent()){
+            //Si gameRatingOptional tiene valor, existe la valoracion, entonces actualizamos los datos
+            result = gameRatingOptional.get();
+            result.setScore(gameRating.getScore());
+            //le colocamos como score al objeto result el score del gameRating que pasamos por parametro
+            result.setScoreDateTime(gameRating.getScoreDateTime());
+            //Podriamos colocar result.setScoreDateTime(ZonedDateTime.now()), pero tendria mas coste, asi que aprovechamos que ya
+            //le colocamos a gameRating un ZonedDateTime.now()
+            return updateGameRating(result);
+            //De aqui lo enviamos al PUT, que se encargará de actualizar los datos
+        }else{
+            //si no existe una valoracion, es decir, gameRatingOptional es null, llamamos al repository y guardamos el gameRating
+            //Finalmente regresamos la URL con la ruta del gameRating creado
+            result = gameRatingRepository.save(gameRating);
+            return ResponseEntity.created(new URI("/api/game-ratings/" + result.getId()))
+                .headers(HeaderUtil.createEntityCreationAlert("gameRating", result.getId().toString()))
+                .body(result);
+        }
     }
+
 
     @PutMapping("/game-ratings")
     @Timed

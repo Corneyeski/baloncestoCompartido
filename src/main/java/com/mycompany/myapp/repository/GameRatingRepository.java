@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Spring Data JPA repository for the GameRating entity.
@@ -33,5 +34,9 @@ public interface GameRatingRepository extends JpaRepository<GameRating,Long> {
         "where gameRating.game.id = :gameID " +
         "and gameRating.user.id = :userID")
     GameRating getRating(@Param("userID") Long userID, @Param("gameID") Long gameID);
+
+    //Creamos la consulta para saber si un user ha votado a un game.
+    Optional<GameRating> findByUserAndGame(User user, Game game);
+
 }
 
