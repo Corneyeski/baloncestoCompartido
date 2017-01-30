@@ -2,16 +2,13 @@ package com.mycompany.myapp.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import com.mycompany.myapp.domain.Game;
-import com.mycompany.myapp.repository.FavouritePlayerRepository;
 import com.mycompany.myapp.repository.GameRatingRepository;
 import com.mycompany.myapp.service.GameService;
-import com.mycompany.myapp.service.dto.GameDTO;
 import com.mycompany.myapp.web.rest.util.HeaderUtil;
 import com.mycompany.myapp.web.rest.util.PaginationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -21,12 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * REST controller for managing Game.
@@ -88,36 +81,6 @@ public class GameResource {
                 result,
                 HttpStatus.OK))
             .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-    }
-
-    @GetMapping("/games/game-rating/{id}")
-    @Timed
-    public ResponseEntity<GameDTO> getGameRating(@PathVariable Long id) {
-        log.debug("REST request to get GameRating : {}", id);
-        Game game = gameService.findOne(id);
-        Double media = gameRatingRepository.findAverage(id);
-
-        GameDTO gameDTO = new GameDTO();
-        gameDTO.setGame(game);
-        gameDTO.setAvgScore(media);
-
-        return new ResponseEntity<>(gameDTO, HttpStatus.OK);
-    }
-
-
-    @GetMapping("/games/top-five-games")
-    @Timed
-    public ResponseEntity<List<GameDTO>> getTopFiveGames() {
-        log.debug("REST request to get TopFiveGames");
-
-        List<Object[]> topFiveGames = gameRatingRepository.findTopFiveGames(new PageRequest(0, 5));
-
-        List<GameDTO> result = topFiveGames.
-            stream().
-            map(game -> new GameDTO((Game) game[0], (Double) game[1])).
-            collect(Collectors.toList());
-
-        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @DeleteMapping("/games/{id}")

@@ -1,14 +1,18 @@
 package com.mycompany.myapp.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import com.mycompany.myapp.domain.Game;
 import com.mycompany.myapp.domain.GameRating;
 import com.mycompany.myapp.repository.GameRatingRepository;
+import com.mycompany.myapp.repository.GameRepository;
 import com.mycompany.myapp.service.GameRatingService;
+import com.mycompany.myapp.service.dto.GameDTO;
 import com.mycompany.myapp.web.rest.util.HeaderUtil;
 import com.mycompany.myapp.web.rest.util.PaginationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,10 +22,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 //TODO Arnau control de errores
 
@@ -38,6 +42,8 @@ public class GameRatingResource {
     private GameRatingService gameRatingService;
     @Inject
     private GameRatingRepository gameRatingRepository;
+    @Inject
+    private GameRepository gameRepository;
 
     @PostMapping("/game-ratings")
     @Timed
@@ -112,5 +118,32 @@ public class GameRatingResource {
     }
 
     //TODO Alan partido por id y la media de las valoraciones
-    //TODO Alfredo top-five partidos
+    @GetMapping("/avgGame/{id}")
+    @Timed
+    public ResponseEntity<GameDTO> getGameRatingAvg(@PathVariable Long id) {
+        log.debug("REST request to get GameRating : {}", id);
+        Game game = gameRepository.findOne(id);
+        Double media = gameRatingRepository.findAverage(id);
+
+        GameDTO gameDTO = new GameDTO(game, media);
+
+        return new ResponseEntity<>(gameDTO, HttpStatus.OK);
+    }
+
+    // TODO - Cristina
+    @GetMapping("/top-five-games")
+    @Timed
+    public ResponseEntity<List<GameDTO>> getTopFiveGames() {
+        log.debug("REST request to get TopFiveGames");
+
+        List<Object[]> topFiveGames = gameRatingRepository.findTopFiveGames(new PageRequest(0, 5));
+
+        List<GameDTO> result = topFiveGames.
+            stream().
+            map(game -> new GameDTO((Game) game[0], (Double) game[1])).
+            collect(Collectors.toList());
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
 }
