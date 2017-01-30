@@ -6,6 +6,7 @@ import com.mycompany.myapp.domain.Player;
 import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.repository.FavouritePlayerRepository;
 import com.mycompany.myapp.repository.PlayerRepository;
+import com.mycompany.myapp.repository.UserRepository;
 import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.security.SecurityUtils;
 import com.mycompany.myapp.service.FavouritePlayerService;
@@ -48,6 +49,8 @@ public class FavouritePlayerResource {
     private FavouritePlayerService favouritePlayerService;
     @Inject
     private FavouritePlayerRepository favouritePlayerRepository;
+    @Inject
+    private UserRepository userRepository;
     @Inject
     private PlayerRepository playerRepository;
 
