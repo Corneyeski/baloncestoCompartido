@@ -11,6 +11,7 @@
         var vm = this;
 
         vm.favouritePlayers = [];
+        vm.topFivePlayers = [];
         vm.loadPage = loadPage;
         vm.page = 0;
         vm.links = {
@@ -28,6 +29,12 @@
                 size: 20,
                 sort: sort()
             }, onSuccess, onError);
+
+            FavouritePlayer.topFive({
+
+            }, onSuccessTopFive, onError);
+
+
             function sort() {
                 var result = [vm.predicate + ',' + (vm.reverse ? 'asc' : 'desc')];
                 if (vm.predicate !== 'id') {
@@ -41,6 +48,14 @@
                 vm.totalItems = headers('X-Total-Count');
                 for (var i = 0; i < data.length; i++) {
                     vm.favouritePlayers.push(data[i]);
+                }
+            }
+
+            function onSuccessTopFive(data, headers) {
+
+                //vm.totalItems = headers('X-Total-Count');
+                for (var i = 0; i < data.length; i++) {
+                    vm.topFivePlayers.push(data[i]);
                 }
             }
 

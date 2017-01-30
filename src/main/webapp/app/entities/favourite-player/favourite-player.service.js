@@ -11,6 +11,8 @@
 
         return $resource(resourceUrl, {}, {
             'query': { method: 'GET', isArray: true},
+            'topFive': { method: 'GET', isArray: true, url:'/api/top-five'},
+
             'get': {
                 method: 'GET',
                 transformResponse: function (data) {
