@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.summarizingInt;
+import static java.util.stream.Collectors.summingInt;
 
 //TODO Arnau control de errores
 
@@ -163,6 +164,21 @@ public class GameRatingResource {
         IntSummaryStatistics result = games.stream().collect(summarizingInt(GameRating::getScore));
 
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @GetMapping("/sumGameRatingScore")
+    @Timed
+    public ResponseEntity<Integer> getSumGameRatingScore(){
+
+        List<GameRating> games = gameRatingRepository.findAll();
+        if(games == null){
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("gameRating", "notexists",
+                "The game rating doesn't exist")).body(null);
+        }
+
+        Integer result = games.stream().collect(summingInt(GameRating::getScore));
+
+        return new ResponseEntity<Integer>(result, HttpStatus.OK);
     }
 
 }
