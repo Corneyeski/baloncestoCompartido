@@ -2,6 +2,7 @@ package com.mycompany.myapp.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import com.mycompany.myapp.domain.FavouritePlayer;
+import com.mycompany.myapp.domain.GameRating;
 import com.mycompany.myapp.domain.Player;
 import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.repository.FavouritePlayerRepository;
@@ -64,9 +65,27 @@ public class FavouritePlayerResource {
                 createFailureAlert("favouritePlayer", "idexists", "A new favouritePlayer cannot already have an ID")).body(null);
         }
 
-            User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
-            //User user = favouritePlayer.getUser();
+        User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
 
+        FavouritePlayer favouriteExist = favouritePlayerRepository.getFavouritePlayer(user.getId(), favouritePlayer.getPlayer().getId());
+
+        FavouritePlayer result;
+
+        if(favouriteExist == null){
+            favouritePlayer.setUser(user);
+            favouritePlayer.setFavouriteDateTime(LocalDateTime.now());
+
+            result = favouritePlayerService.save(favouritePlayer);
+        }else{
+            favouritePlayerService.delete(favouriteExist.getId());
+            result = favouritePlayerService.save(new FavouritePlayer(LocalDateTime.now(), user, favouritePlayer.getPlayer()));
+        }
+
+        return ResponseEntity.created(new URI("/api/favourite-players/" + result.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert("favouritePlayer", result.getId().toString()))
+            .body(result);
+            //User user = favouritePlayer.getUser();
+/*
             favouritePlayer.setUser(user);
             favouritePlayer.setFavouriteDateTime(LocalDateTime.now());
 
@@ -74,7 +93,7 @@ public class FavouritePlayerResource {
 
             return ResponseEntity.created(new URI("/api/favourite-players/" + result.getId()))
                 .headers(HeaderUtil.createEntityCreationAlert("favouritePlayer", result.getId().toString()))
-                .body(result);
+                .body(result);*/
     }
 
     // PUT

@@ -117,7 +117,7 @@ public class GameRatingResource {
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("gameRating", id.toString())).build();
     }
 
-    //TODO Alan partido por id y la media de las valoraciones
+    //TODO Alan
     @GetMapping("/avgGame/{id}")
     @Timed
     public ResponseEntity<GameDTO> getGameRatingAvg(@PathVariable Long id) {

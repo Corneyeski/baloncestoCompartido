@@ -32,5 +32,9 @@ public interface FavouritePlayerRepository extends JpaRepository<FavouritePlayer
         "where favouritePlayer.player = :favourite")
     List<LocalDateTime> getEvolution(@Param("favourite") Player favourite);
 
+    @Query("select favouritePlayer from FavouritePlayer favouritePlayer " +
+        "where favouritePlayer.user.id = :userID " +
+        "and favouritePlayer.player.id = :playerID")
+    FavouritePlayer getFavouritePlayer(@Param("userID") Long userID, @Param("playerID") Long playerID);
 
 }
