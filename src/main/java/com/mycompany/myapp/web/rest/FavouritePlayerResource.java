@@ -84,16 +84,6 @@ public class FavouritePlayerResource {
         return ResponseEntity.created(new URI("/api/favourite-players/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert("favouritePlayer", result.getId().toString()))
             .body(result);
-            //User user = favouritePlayer.getUser();
-/*
-            favouritePlayer.setUser(user);
-            favouritePlayer.setFavouriteDateTime(LocalDateTime.now());
-
-            FavouritePlayer result = favouritePlayerService.save(favouritePlayer);
-
-            return ResponseEntity.created(new URI("/api/favourite-players/" + result.getId()))
-                .headers(HeaderUtil.createEntityCreationAlert("favouritePlayer", result.getId().toString()))
-                .body(result);*/
     }
 
     // PUT
@@ -186,8 +176,8 @@ public class FavouritePlayerResource {
 
         Player p = playerRepository.findPlayerById(id);
         if(p == null){
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("gameRating", "idexists",
-                "A new gameRating cannot already have an ID")).body(null);
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("favouritePlayer", "notexists",
+                "Player doesn't exists")).body(null);
         }
 
         List<EvolutionDTO> result = new ArrayList<>();

@@ -23,9 +23,12 @@ import javax.inject.Inject;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
+import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.summarizingInt;
 
 //TODO Arnau control de errores
 
@@ -142,6 +145,22 @@ public class GameRatingResource {
             stream().
             map(game -> new GameDTO((Game) game[0], (Double) game[1])).
             collect(Collectors.toList());
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    // TODO - Cristina -> SummarizingInt
+    @GetMapping("/statistics")
+    @Timed
+    public ResponseEntity<IntSummaryStatistics> getStatistics(){
+
+        List<GameRating> games = gameRatingRepository.findAll();
+        if(games == null){
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("gameRating", "notexists",
+                "The game rating doesn't exist")).body(null);
+        }
+
+        IntSummaryStatistics result = games.stream().collect(summarizingInt(GameRating::getScore));
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
