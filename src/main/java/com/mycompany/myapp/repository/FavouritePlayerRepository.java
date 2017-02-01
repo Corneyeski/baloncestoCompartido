@@ -1,6 +1,7 @@
 package com.mycompany.myapp.repository;
 
 import com.mycompany.myapp.domain.FavouritePlayer;
+import com.mycompany.myapp.domain.Player;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -28,7 +29,12 @@ public interface FavouritePlayerRepository extends JpaRepository<FavouritePlayer
 
     @Query("select favouritePlayer.favouriteDateTime " +
         "from FavouritePlayer favouritePlayer " +
-        "where favouritePlayer.player.id = :favouriteId")
-    List<LocalDateTime> getEvolution(@Param("favouriteId") Long favouriteId);
+        "where favouritePlayer.player = :favourite")
+    List<LocalDateTime> getEvolution(@Param("favourite") Player favourite);
+
+    @Query("select favouritePlayer from FavouritePlayer favouritePlayer " +
+        "where favouritePlayer.user.id = :userID " +
+        "and favouritePlayer.player.id = :playerID")
+    FavouritePlayer getFavouritePlayer(@Param("userID") Long userID, @Param("playerID") Long playerID);
 
 }

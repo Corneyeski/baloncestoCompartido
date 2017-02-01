@@ -1,18 +1,18 @@
 package com.mycompany.myapp.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import com.mycompany.myapp.domain.Game;
 import com.mycompany.myapp.domain.GameRating;
 import com.mycompany.myapp.repository.GameRatingRepository;
 import com.mycompany.myapp.repository.GameRepository;
-import com.mycompany.myapp.repository.UserRepository;
-import com.mycompany.myapp.security.SecurityUtils;
 import com.mycompany.myapp.service.GameRatingService;
-import com.mycompany.myapp.service.GameService;
+import com.mycompany.myapp.service.dto.GameDTO;
 import com.mycompany.myapp.web.rest.util.HeaderUtil;
 import com.mycompany.myapp.web.rest.util.PaginationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -22,10 +22,14 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.summarizingInt;
+import static java.util.stream.Collectors.summingInt;
 
 //TODO Arnau control de errores
 
@@ -40,67 +44,39 @@ public class GameRatingResource {
 
     @Inject
     private GameRatingService gameRatingService;
-
-    @Inject
-    private GameRepository gameRepository;
-
     @Inject
     private GameRatingRepository gameRatingRepository;
-
     @Inject
-    private UserRepository userRepository;
-
-    @Inject
-    private GameService gameService;
+    private GameRepository gameRepository;
 
     @PostMapping("/game-ratings")
     @Timed
     public ResponseEntity<GameRating> createGameRating(@RequestBody GameRating gameRating) throws URISyntaxException {
         log.debug("REST request to save GameRating : {}", gameRating);
         if (gameRating.getId() != null) {
-            //Comprobamos si el id de la valoracion existe, si existe regresamos un Failure Alert
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("gameRating", "idexists", "A new gameRating cannot already have an ID")).body(null);
         }
 
-        if(gameRepository.findOne(gameRating.getGame().getId())==null){
-            //Comprobamos si el objeto gameRating existe, si no existe regresamos un 403 bad request
-            return ResponseEntity.badRequest().
-                headers(HeaderUtil.createFailureAlert("gameRating","gameNotExistant","Game doesn't exists")).body(null);
-        }
+        ZonedDateTime now = ZonedDateTime.now();
 
-        gameRating.setUser(userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get());
-        //Colocamos dentro del gameRating que pasamos EL USUARIO QUE ESTA LOGGEADO
-        gameRating.setScoreDateTime(ZonedDateTime.now());
-        //Le colocamos el tiempo de hoy, ya que bien vaya a actualizar o crear, será hoy cuando lo haga
+        GameRating game = gameRatingRepository.getRating(gameRating.getUser().getId(), gameRating.getGame().getId());
+        GameRating result;
+        // si no hay ninguna puntuación a ese partido con ese usuario
+        if(game == null){
+            gameRating.setScoreDateTime(now);
+            result = gameRatingService.save(gameRating);
 
-        Optional<GameRating> gameRatingOptional = gameRatingRepository.findByUserAndGame(gameRating.getUser(),gameRating.getGame());
-
-        //buscamos una valoracion de ese usuario y del juego que pasamos por parametro
-        //Lo envolvemos en un Optional porque puede regresar un valor o un null
-        //OJO dentro del repository la consulta tambien debe tener un Optional
-
-        GameRating result = null;
-
-        if(gameRatingOptional.isPresent()){
-            //Si gameRatingOptional tiene valor, existe la valoracion, entonces actualizamos los datos
-            result = gameRatingOptional.get();
-            result.setScore(gameRating.getScore());
-            //le colocamos como score al objeto result el score del gameRating que pasamos por parametro
-            result.setScoreDateTime(gameRating.getScoreDateTime());
-            //Podriamos colocar result.setScoreDateTime(ZonedDateTime.now()), pero tendria mas coste, asi que aprovechamos que ya
-            //le colocamos a gameRating un ZonedDateTime.now()
-            return updateGameRating(result);
-            //De aqui lo enviamos al PUT, que se encargará de actualizar los datos
         }else{
-            //si no existe una valoracion, es decir, gameRatingOptional es null, llamamos al repository y guardamos el gameRating
-            //Finalmente regresamos la URL con la ruta del gameRating creado
-            result = gameRatingRepository.save(gameRating);
-            return ResponseEntity.created(new URI("/api/game-ratings/" + result.getId()))
-                .headers(HeaderUtil.createEntityCreationAlert("gameRating", result.getId().toString()))
-                .body(result);
+            //aqui el put
+            GameRating aux = new GameRating(gameRating.getScore(), now, game.getUser(), game.getGame());
+            gameRatingService.delete(game.getId());
+            result = gameRatingService.save(aux);
         }
-    }
 
+        return ResponseEntity.created(new URI("/api/game-ratings/" + result.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert("gameRating", result.getId().toString()))
+            .body(result);
+    }
 
     @PutMapping("/game-ratings")
     @Timed
@@ -145,6 +121,64 @@ public class GameRatingResource {
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("gameRating", id.toString())).build();
     }
 
-    //TODO Alan partido por id y la media de las valoraciones
-    //TODO Alfredo top-five partidos
+    //TODO Alan
+    @GetMapping("/avgGame/{id}")
+    @Timed
+    public ResponseEntity<GameDTO> getGameRatingAvg(@PathVariable Long id) {
+        log.debug("REST request to get GameRating : {}", id);
+        Game game = gameRepository.findOne(id);
+        Double media = gameRatingRepository.findAverage(id);
+
+        GameDTO gameDTO = new GameDTO(game, media);
+
+        return new ResponseEntity<>(gameDTO, HttpStatus.OK);
+    }
+
+    // TODO - Cristina
+    @GetMapping("/top-five-games")
+    @Timed
+    public ResponseEntity<List<GameDTO>> getTopFiveGames() {
+        log.debug("REST request to get TopFiveGames");
+
+        List<Object[]> topFiveGames = gameRatingRepository.findTopFiveGames(new PageRequest(0, 5));
+
+        List<GameDTO> result = topFiveGames.
+            stream().
+            map(game -> new GameDTO((Game) game[0], (Double) game[1])).
+            collect(Collectors.toList());
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    // TODO - Cristina -> SummarizingInt
+    @GetMapping("/statistics")
+    @Timed
+    public ResponseEntity<IntSummaryStatistics> getStatistics(){
+
+        List<GameRating> games = gameRatingRepository.findAll();
+        if(games == null){
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("gameRating", "notexists",
+                "The game rating doesn't exist")).body(null);
+        }
+
+        IntSummaryStatistics result = games.stream().collect(summarizingInt(GameRating::getScore));
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @GetMapping("/sumGameRatingScore")
+    @Timed
+    public ResponseEntity<Integer> getSumGameRatingScore(){
+
+        List<GameRating> games = gameRatingRepository.findAll();
+        if(games == null){
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("gameRating", "notexists",
+                "The game rating doesn't exist")).body(null);
+        }
+
+        Integer result = games.stream().collect(summingInt(GameRating::getScore));
+
+        return new ResponseEntity<Integer>(result, HttpStatus.OK);
+    }
+
 }

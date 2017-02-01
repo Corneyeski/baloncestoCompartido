@@ -28,6 +28,16 @@ public class FavouritePlayer implements Serializable {
     @ManyToOne
     private Player player;
 
+    public FavouritePlayer(LocalDateTime favouriteDateTime, User user, Player player) {
+        this.favouriteDateTime = favouriteDateTime;
+        this.user = user;
+        this.player = player;
+    }
+
+    public FavouritePlayer(){
+
+    }
+
     public Long getId() {
         return id;
     }

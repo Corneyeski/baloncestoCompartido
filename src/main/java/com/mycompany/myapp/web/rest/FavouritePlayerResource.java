@@ -2,6 +2,7 @@ package com.mycompany.myapp.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import com.mycompany.myapp.domain.FavouritePlayer;
+import com.mycompany.myapp.domain.GameRating;
 import com.mycompany.myapp.domain.Player;
 import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.repository.FavouritePlayerRepository;
@@ -11,6 +12,7 @@ import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.security.SecurityUtils;
 import com.mycompany.myapp.service.FavouritePlayerService;
 import com.mycompany.myapp.service.dto.EvolutionDTO;
+import com.mycompany.myapp.service.dto.EvolutionGeneralJugDTO;
 import com.mycompany.myapp.service.dto.PlayerDTO;
 import com.mycompany.myapp.web.rest.util.HeaderUtil;
 import com.mycompany.myapp.web.rest.util.PaginationUtil;
@@ -47,9 +49,9 @@ public class FavouritePlayerResource {
     @Inject
     private FavouritePlayerService favouritePlayerService;
     @Inject
-    private UserRepository userRepository;
-    @Inject
     private FavouritePlayerRepository favouritePlayerRepository;
+    @Inject
+    private UserRepository userRepository;
     @Inject
     private PlayerRepository playerRepository;
 
@@ -62,18 +64,26 @@ public class FavouritePlayerResource {
             return ResponseEntity.badRequest().headers(HeaderUtil.
                 createFailureAlert("favouritePlayer", "idexists", "A new favouritePlayer cannot already have an ID")).body(null);
         }
-            //TODO Falta integrar el control de errores de Arnau
-            User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
-            //User user = favouritePlayer.getUser();
 
+        User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
+
+        FavouritePlayer favouriteExist = favouritePlayerRepository.getFavouritePlayer(user.getId(), favouritePlayer.getPlayer().getId());
+
+        FavouritePlayer result;
+
+        if(favouriteExist == null){
             favouritePlayer.setUser(user);
             favouritePlayer.setFavouriteDateTime(LocalDateTime.now());
 
-            FavouritePlayer result = favouritePlayerService.save(favouritePlayer);
+            result = favouritePlayerService.save(favouritePlayer);
+        }else{
+            favouritePlayerService.delete(favouriteExist.getId());
+            result = favouritePlayerService.save(new FavouritePlayer(LocalDateTime.now(), user, favouritePlayer.getPlayer()));
+        }
 
-            return ResponseEntity.created(new URI("/api/favourite-players/" + result.getId()))
-                .headers(HeaderUtil.createEntityCreationAlert("favouritePlayer", result.getId().toString()))
-                .body(result);
+        return ResponseEntity.created(new URI("/api/favourite-players/" + result.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert("favouritePlayer", result.getId().toString()))
+            .body(result);
     }
 
     // PUT
@@ -155,7 +165,7 @@ public class FavouritePlayerResource {
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
-    //TODO - Alan/Cris
+    //TODO - Alan
     // GET evolution player id
     @GetMapping("/player-evolution/{id}")
     @Timed
@@ -164,28 +174,30 @@ public class FavouritePlayerResource {
 
         log.debug("REST request to get PlayerEvolution : {}", id);
 
+        Player p = playerRepository.findPlayerById(id);
+        if(p == null){
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("favouritePlayer", "notexists",
+                "Player doesn't exists")).body(null);
+        }
+
         List<EvolutionDTO> result = new ArrayList<>();
 
-        List<LocalDateTime> datesLDT = favouritePlayerRepository.getEvolution(id);
+        List<LocalDateTime> datesLDT = favouritePlayerRepository.getEvolution(p);
 
-        Map<LocalDate, Long> mapFinal = datesLDT.stream().
-            map(dateTime -> dateTime.toLocalDate()).
-            sorted().
-            collect(Collectors.groupingBy(Function.identity(),
-            Collectors.counting()));
+        datesLDT.parallelStream()
+            .map(localDateTime -> localDateTime.toLocalDate())
+            .collect(Collectors
+                .groupingBy(Function.identity(),Collectors.counting()))
+            .forEach((date,count) ->result.add(new EvolutionDTO(date,count)));
 
-        mapFinal.forEach((date, numFav) ->{
-            EvolutionDTO evolutionDTO = new EvolutionDTO();
-            evolutionDTO.setDate(date);
-            evolutionDTO.setNumFavorites(numFav);
-
-            result.add(evolutionDTO);
-        });
+        result.stream()
+            .sorted(Comparator.comparing(EvolutionDTO::getDate))
+            .collect(Collectors.toList());
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    //TODO - Alan/Cris
+    //TODO - Cris
     // GET evolution all players
     @GetMapping("/all-player-evolution")
     @Timed
@@ -199,7 +211,7 @@ public class FavouritePlayerResource {
         List<Player> players = playerRepository.findAll();
 
         players.forEach(player -> {
-            List<LocalDateTime> datesLDT = favouritePlayerRepository.getEvolution(player.getId());
+            List<LocalDateTime> datesLDT = favouritePlayerRepository.getEvolution(player);
 
             Map<LocalDate, Long> mapDates = datesLDT.stream().
                 map(dateTime -> dateTime.toLocalDate()).
@@ -213,6 +225,37 @@ public class FavouritePlayerResource {
         });
 
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    //TODO - Alan
+    // GET evolution all players -> using DTO
+    @GetMapping("/all-player-evolutionDTO")
+    @Timed
+    public ResponseEntity<List<EvolutionGeneralJugDTO>> evolutionGeneralPlayer(){
+
+        List<EvolutionGeneralJugDTO> evolutionGeneraljDTOList = new ArrayList<>();
+
+        List<Player> players = playerRepository.findAll();
+
+        players.forEach(player -> {
+
+            List<LocalDateTime> listFav = favouritePlayerRepository.getEvolution(player);
+            ArrayList<EvolutionDTO> evolution = new ArrayList<>();
+
+            listFav.parallelStream()
+                .map(localDateTime -> localDateTime.toLocalDate())
+                .collect(Collectors
+                    .groupingBy(Function.identity(),Collectors.counting()))
+                .forEach((date,count) ->evolution.add(new EvolutionDTO(date,count)));
+
+            List<EvolutionDTO> result = evolution.stream()
+                .sorted(Comparator.comparing(EvolutionDTO::getDate))
+                .collect(Collectors.toList());
+
+            evolutionGeneraljDTOList.add(new EvolutionGeneralJugDTO(player, result));
+
+        });
+        return new ResponseEntity<>(evolutionGeneraljDTOList,HttpStatus.OK);
     }
 
     // DELETE
