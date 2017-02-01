@@ -31,6 +31,28 @@
                 }]
             }
         })
+            .state('top5-player', {
+                parent: 'entity',
+                url: '/favourite-player/top-5',
+                data: {
+                    authorities: ['ROLE_USER'],
+                    pageTitle: 'baloncestoApp.top5Player.home.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'app/entities/favourite-player/top5-players.html',
+                        controller: 'FavouritePlayerController',
+                        controllerAs: 'vm'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function ($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('favouritePlayer');
+                        $translatePartialLoader.addPart('global');
+                        return $translate.refresh();
+                    }]
+                }
+            })
         .state('favourite-player-detail', {
             parent: 'entity',
             url: '/favourite-player/{id}',

@@ -1,0 +1,34 @@
+<div>
+    <h2 data-translate="baloncestoApp.favouritePlayer.home.title">Favourite Players</h2>
+
+    <h2>Top 5 Players</h2>
+
+
+    <div class="table-responsive">
+        <table class="jh-table table table-striped">
+            <thead>
+            <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.reset()">
+                <th><span data-translate="global.field.id">ID</span> <span ></span></th>
+
+                <th><span data-translate="baloncestoApp.favouritePlayer.player">Player</span> <span ></span></th>
+                <th><span>Nº Favs</span> <span></span></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody infinite-scroll="vm.loadPage(vm.page + 1)" infinite-scroll-disabled="vm.page >= vm.links['last']">
+            <tr ng-repeat="favouritePlayer in vm.topFivePlayers track by favouritePlayer.player.id">
+                <td><a ui-sref="favourite-player-detail({id:favouritePlayer.id})">{{favouritePlayer.player.id}}</a></td>
+
+                <td>
+                    <a ui-sref="player-detail({id:favouritePlayer.player.id})">{{favouritePlayer.player.name}}</a>
+                </td>
+                <td>
+                    {{favouritePlayer.numFavs}}
+                </td>
+
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>

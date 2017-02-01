@@ -1,6 +1,8 @@
 package com.mycompany.myapp.repository;
 
+import com.mycompany.myapp.domain.Game;
 import com.mycompany.myapp.domain.GameRating;
+import com.mycompany.myapp.domain.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
