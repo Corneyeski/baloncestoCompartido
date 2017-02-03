@@ -7,8 +7,10 @@ import com.mycompany.myapp.repository.GameRatingRepository;
 import com.mycompany.myapp.repository.GameRepository;
 import com.mycompany.myapp.service.GameRatingService;
 import com.mycompany.myapp.service.dto.GameDTO;
+import com.mycompany.myapp.service.dto.ResultDTO;
 import com.mycompany.myapp.web.rest.util.HeaderUtil;
 import com.mycompany.myapp.web.rest.util.PaginationUtil;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -168,7 +170,7 @@ public class GameRatingResource {
 
     @GetMapping("/sumGameRatingScore")
     @Timed
-    public ResponseEntity<Integer> getSumGameRatingScore(){
+    public ResponseEntity<ResultDTO> getSumGameRatingScore(){
 
         List<GameRating> games = gameRatingRepository.findAll();
         if(games == null){
@@ -177,8 +179,9 @@ public class GameRatingResource {
         }
 
         Integer result = games.stream().collect(summingInt(GameRating::getScore));
-
-        return new ResponseEntity<Integer>(result, HttpStatus.OK);
+        ResultDTO resultDTO = new ResultDTO(result);
+        //System.out.println(result);
+        return new ResponseEntity<ResultDTO>(resultDTO, HttpStatus.OK);
     }
 
 }

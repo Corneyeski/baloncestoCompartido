@@ -1,60 +1,60 @@
 <div>
-    <h2 data-translate="baloncestoApp.favouritePlayer.home.title">Favourite Players</h2>
+    <h2>Sum Game Ratings: {{vm.sumGameScore.result}}</h2>
+    <!--
     <jhi-alert></jhi-alert>
     <div class="container-fluid">
         <div class="row">
             <div class="col-xs-4 no-padding-left">
-                <button class="btn btn-primary" ui-sref="favourite-player.new" >
+                <button class="btn btn-primary" ui-sref="game-rating.new" >
                     <span class="glyphicon glyphicon-plus"></span>
-                    <span  data-translate="baloncestoApp.favouritePlayer.home.createLabel">
-                        Create new Favourite Player
+                    <span  data-translate="baloncestoApp.gameRating.home.createLabel">
+                        Create new Game Rating
                     </span>
                 </button>
             </div>
         </div>
     </div>
     <br/>
-
-
     <div class="table-responsive">
         <table class="jh-table table table-striped">
             <thead>
                 <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.reset()">
                     <th jh-sort-by="id"><span data-translate="global.field.id">ID</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th jh-sort-by="favouriteDateTime"><span data-translate="baloncestoApp.favouritePlayer.favouriteDateTime">Favourite Date Time</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th jh-sort-by="user.login"><span data-translate="baloncestoApp.favouritePlayer.user">User</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th jh-sort-by="player.name"><span data-translate="baloncestoApp.favouritePlayer.player">Player</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="score"><span data-translate="baloncestoApp.gameRating.score">Score</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="scoreDateTime"><span data-translate="baloncestoApp.gameRating.scoreDateTime">Score Date Time</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="user.login"><span data-translate="baloncestoApp.gameRating.user">User</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="game.name"><span data-translate="baloncestoApp.gameRating.game">Game</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th></th>
                 </tr>
             </thead>
             <tbody infinite-scroll="vm.loadPage(vm.page + 1)" infinite-scroll-disabled="vm.page >= vm.links['last']">
-                <tr ng-repeat="favouritePlayer in vm.favouritePlayers track by favouritePlayer.id">
-                    <td><a ui-sref="favourite-player-detail({id:favouritePlayer.id})">{{favouritePlayer.id}}</a></td>
-                    <td>{{favouritePlayer.favouriteDateTime | date:'medium'}}</td>
+                <tr ng-repeat="gameRating in vm.gameRatings track by gameRating.id">
+                    <td><a ui-sref="game-rating-detail({id:gameRating.id})">{{gameRating.id}}</a></td>
+                    <td>{{gameRating.score}}</td>
+                    <td>{{gameRating.scoreDateTime | date:'medium'}}</td>
                     <td>
-                        {{favouritePlayer.user.login}}
+                        {{gameRating.user.login}}
                     </td>
                     <td>
-                        <a ui-sref="player-detail({id:favouritePlayer.player.id})">{{favouritePlayer.player.name}}</a>
+                        <a ui-sref="game-detail({id:gameRating.game.id})">{{gameRating.game.name}}</a>
                     </td>
                     <td class="text-right">
                         <div class="btn-group flex-btn-group-container">
                             <button type="submit"
-                                    ui-sref="favourite-player-detail({id:favouritePlayer.id})"
+                                    ui-sref="game-rating-detail({id:gameRating.id})"
                                     class="btn btn-info btn-sm">
                                 <span class="glyphicon glyphicon-eye-open"></span>
                                 <span class="hidden-xs hidden-sm" data-translate="entity.action.view"></span>
                             </button>
                             <button type="submit"
-                                    ui-sref="favourite-player.edit({id:favouritePlayer.id})"
+                                    ui-sref="game-rating.edit({id:gameRating.id})"
                                     class="btn btn-primary btn-sm">
                                 <span class="glyphicon glyphicon-pencil"></span>
                                 <span class="hidden-xs hidden-sm" data-translate="entity.action.edit"></span>
                             </button>
-                            <!--Add restricción para que solo admin puedan modificar-->
                             <button type="submit"
-                                    ui-sref="favourite-player.delete({id:favouritePlayer.id})"
-                                    class="btn btn-danger btn-sm" has-authority="ROLE_ADMIN">
+                                    ui-sref="game-rating.delete({id:gameRating.id})"
+                                    class="btn btn-danger btn-sm">
                                 <span class="glyphicon glyphicon-remove-circle"></span>
                                 <span class="hidden-xs hidden-sm" data-translate="entity.action.delete"></span>
                             </button>
@@ -64,5 +64,5 @@
             </tbody>
         </table>
     </div>
-
+    -->
 </div>

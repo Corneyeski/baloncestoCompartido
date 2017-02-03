@@ -31,6 +31,52 @@
                 }]
             }
         })
+
+            .state('game-rating-sum', {
+                parent: 'entity',
+                url: '/game-rating-sum',
+                data: {
+                    authorities: ['ROLE_USER'],
+                    pageTitle: 'baloncestoApp.gameRating.home.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'app/entities/game-rating/game-ratings-sum.html',
+                        controller: 'GameRatingController',
+                        controllerAs: 'vm'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function ($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('gameRating');
+                        $translatePartialLoader.addPart('global');
+                        return $translate.refresh();
+                    }]
+                }
+            })
+
+            .state('game-rating-avg', {
+                parent: 'entity',
+                url: '/game-rating/avg/{id}',
+                data: {
+                    authorities: ['ROLE_USER'],
+                    pageTitle: 'baloncestoApp.gameRating.home.title'
+                },
+                views: {
+                    'content@': {
+                        templateUrl: 'app/entities/game-rating/game-ratings-avg.html',
+                        controller: 'GameRatingController',
+                        controllerAs: 'vm'
+                    }
+                },
+                resolve: {
+                    translatePartialLoader: ['$translate', '$translatePartialLoader', function ($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('gameRating');
+                        $translatePartialLoader.addPart('global');
+                        return $translate.refresh();
+                    }]
+                }
+            })
         .state('game-rating-detail', {
             parent: 'entity',
             url: '/game-rating/{id}',
