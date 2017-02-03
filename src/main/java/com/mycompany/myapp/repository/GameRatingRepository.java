@@ -3,6 +3,7 @@ package com.mycompany.myapp.repository;
 import com.mycompany.myapp.domain.Game;
 import com.mycompany.myapp.domain.GameRating;
 import com.mycompany.myapp.domain.User;
+import com.mycompany.myapp.service.dto.GameDTO;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -37,6 +38,9 @@ public interface GameRatingRepository extends JpaRepository<GameRating,Long> {
 
     //Creamos la consulta para saber si un user ha votado a un game.
     Optional<GameRating> findByUserAndGame(User user, Game game);
+
+    @Query("select gameRating.game,avg(gameRating.score) from GameRating gameRating group by gameRating.game")
+    List<Object[]> findAllAverage();
 
 }
 

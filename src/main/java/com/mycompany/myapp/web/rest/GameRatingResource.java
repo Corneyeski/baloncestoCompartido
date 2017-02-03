@@ -136,6 +136,25 @@ public class GameRatingResource {
         return new ResponseEntity<>(gameDTO, HttpStatus.OK);
     }
 
+    @GetMapping("/avgGameAll")
+    @Timed
+    public ResponseEntity<List<GameDTO>> getGameRatingAvgAll() {
+        log.debug("REST request to get GameRatingAll : {}");
+
+
+        List<Object[]> listaGameRatingAvg = gameRatingRepository.findAllAverage();
+
+        List<GameDTO> result = listaGameRatingAvg.
+            stream().
+            map(game -> new GameDTO((Game) game[0], (Double) game[1])).
+            collect(Collectors.toList());
+        System.out.println("LISTA:");
+        System.out.println();
+        System.out.println(result);
+        System.out.println();
+        return new ResponseEntity<List<GameDTO>>(result, HttpStatus.OK);
+    }
+
     // TODO - Cristina
     @GetMapping("/top-five-games")
     @Timed

@@ -11,6 +11,7 @@
         var vm = this;
         vm.sumGameScore = 0;
         vm.gameRatings = [];
+        vm.gameRatingsAvgAll = [];
         vm.loadPage = loadPage;
         vm.page = 0;
         vm.links = {
@@ -36,6 +37,11 @@
             },
                 onSuccessSumGame, onError);
 
+            GameRating.avgGameRatingAll({
+
+                },
+                onSuccessGameRatingAll, onError);
+
 
             function sort() {
                 var result = [vm.predicate + ',' + (vm.reverse ? 'asc' : 'desc')];
@@ -51,6 +57,15 @@
                 vm.totalItems = headers('X-Total-Count');
                 for (var i = 0; i < data.length; i++) {
                     vm.gameRatings.push(data[i]);
+                }
+            }
+
+            function onSuccessGameRatingAll(data, headers) {
+
+                // vm.links = ParseLinks.parse(headers('link'));
+                // vm.totalItems = headers('X-Total-Count');
+                for (var i = 0; i < data.length; i++) {
+                    vm.gameRatingsAvgAll.push(data[i]);
                 }
             }
 
